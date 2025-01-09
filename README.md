@@ -27,7 +27,7 @@ python word_filter.py
    - 進度條會顯示目前學習進度
    - 可隨時點擊「匯出生詞PDF」將不認識的單字匯出
 
-![image](./image.png)
+![image](/ui.png)
 
 3. 功能特色：
    - 自動保存進度，下次開啟時會從上次離開的地方繼續
