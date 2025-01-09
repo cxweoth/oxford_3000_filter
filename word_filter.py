@@ -91,18 +91,45 @@ class WordFilterApp:
             c = canvas.Canvas("unknown_words.pdf", pagesize=letter)
             c.setFont("Helvetica", 12)
             
-            # 設置標題
-            c.drawString(250, 750, "Unknown Words List")
+            # 準備單字列表（加上編號）
+            sorted_words = sorted(self.unknown_words)
+            numbered_words = [f"{i+1}. {word}" for i, word in enumerate(sorted_words)]
             
-            # 輸出單字列表
-            y = 720
-            for word in sorted(self.unknown_words):
-                if y < 50:  # 如果頁面空間不足，新增一頁
+            # 設定頁面參數
+            words_per_page = 90  # 每頁30行 x 3欄 = 90個單字
+            col_x = [50, 220, 390]  # 三欄的x座標
+            line_height = 20  # 行高
+            
+            # 計算頁面垂直居中的起始位置
+            page_height = letter[1]  # 獲取頁面高度
+            content_height = 30 * line_height  # 30行的總高度
+            margin_top = (page_height - content_height) / 2  # 計算上方邊距
+            
+            # 分頁處理單字
+            for page_num, page_start in enumerate(range(0, len(numbered_words), words_per_page)):
+                if page_num == 0:  # 只在第一頁顯示標題
+                    c.drawString(250, margin_top + content_height + 30, "Unknown Words List")
+                    start_y = margin_top + content_height  # 從內容區域的頂部開始
+                else:
+                    start_y = margin_top + content_height  # 從內容區域的頂部開始
+                
+                # 取得這一頁要顯示的單字
+                page_words = numbered_words[page_start:page_start + words_per_page]
+                
+                # 在這一頁上繪製單字
+                for i, word in enumerate(page_words):
+                    # 計算在頁面上的位置
+                    col = i % 3  # 決定是第幾欄
+                    row = i // 3  # 決定是第幾行
+                    x = col_x[col]
+                    y = start_y - (row * line_height)
+                    
+                    c.drawString(x, y, word)
+                
+                # 如果還有更多單字，就新增一頁
+                if page_start + words_per_page < len(numbered_words):
                     c.showPage()
                     c.setFont("Helvetica", 12)
-                    y = 750
-                c.drawString(50, y, word)
-                y -= 20
             
             c.save()
             messagebox.showinfo("匯出成功", "生詞已匯出至 unknown_words.pdf")
